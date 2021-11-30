@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-// using TMPro;
+using System.IO;
+using TMPro;
 
 
 #if UNITY_EDITOR
@@ -17,6 +18,9 @@ public class MenuUIHandler : MonoBehaviour
     public static MenuUIHandler Instance;
 
     public string playerName;
+    public int highScore;
+    public string highScoreName;
+    public TextMeshProUGUI BestScoreText;
 
     public GameObject inputField;
     // public TextMeshProUGUI test;
@@ -38,7 +42,9 @@ public class MenuUIHandler : MonoBehaviour
 
     void Start()
     {
-        
+        LoadHighScore();
+        BestScoreText.text = $"Best Score : {highScoreName} : {highScore}";
+        // Debug.Log(highScore);
     }
 
     // Update is called once per frame
@@ -69,5 +75,43 @@ public class MenuUIHandler : MonoBehaviour
 #else
         Application.Quit();
 # endif
+    }
+
+    public void ResetHighScore()
+    {
+        highScore = 0;
+        playerName = "";
+        SaveHighScore();
+        Start();
+    }
+
+    [System.Serializable]
+    class SaveData
+    {
+        public int highScore;
+        public string name;
+    }
+
+    public void LoadHighScore()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+            highScore = data.highScore;
+            highScoreName = data.name;
+        }
+    }
+
+    public void SaveHighScore()
+    {
+        SaveData data = new SaveData();
+        data.highScore = highScore;
+        data.name = playerName;
+        string json = JsonUtility.ToJson(data);
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
     }
 }
