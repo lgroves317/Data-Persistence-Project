@@ -92,6 +92,7 @@ public class MainManager : MonoBehaviour
             m_HighScore = m_Points;
             m_HighScoreName = m_Name;
             SaveHighScore();
+            MenuUIHandler.Instance.LoadHighScore();
             BestScore();
         }
         m_GameOver = true;
